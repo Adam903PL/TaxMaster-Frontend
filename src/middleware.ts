@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Jeśli nie ma tokena, a próbuje wejść na stronę chronioną
-  if (!token && pathname !== '/login') {
+  if (!token && !NOT_PROTECTED.includes(pathname)) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

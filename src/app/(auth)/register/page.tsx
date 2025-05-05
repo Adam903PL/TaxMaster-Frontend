@@ -1,10 +1,11 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { RegisterFunction } from '@/lib/auth/register/action';
 
 const DarkRegistrationForm = () => {
-//   const router = useRouter();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     repeatEmail: "",
@@ -51,7 +52,7 @@ const DarkRegistrationForm = () => {
     
     // Repeat Email validation
     if (!formData.repeatEmail) {
-      newErrors.repeatEmail = "Repeat email is required";
+      newErrors.repeatEmail = "repeat_email_required";
       valid = false;
     } else if (formData.email !== formData.repeatEmail) {
       newErrors.repeatEmail = "Emails do not match";
@@ -86,15 +87,26 @@ const DarkRegistrationForm = () => {
       setRegistrationError(false);
       
       try {
-        // For now, just simulate a successful registration
-        // In a real application, you would call a registration API here
-        setTimeout(() => {
-          console.log("Registration data:", formData);
+        const respRegister = await RegisterFunction(formData);
+        console.log(respRegister,"sjsjsjsjsj")
+        if (respRegister === "Email already registered") {
+          setErrors({
+            ...errors,
+            email: "Email already registered",
+            repeatEmail: "Email already registered"
+          });
+          setRegistrationError(true);
+        } else if (respRegister === true) {
           setSubmitted(true);
-          setIsLoading(false);
-        }, 1500);
+          setTimeout(() => {
+            router.push('/login');
+          }, 2000);
+        } else {
+          setRegistrationError(true);
+        }
       } catch (error) {
         setRegistrationError(true);
+      } finally {
         setIsLoading(false);
       }
     }
@@ -149,13 +161,33 @@ const DarkRegistrationForm = () => {
     }
   };
 
+  const repeatEmailErrorVariant = {
+    initial: { opacity: 0, scale: 0.9 },
+    animate: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 300,
+        damping: 15
+      }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.9,
+      transition: { duration: 0.2 }
+    }
+  };
+  useEffect(()=>{
+    console.log(errors.email )
+  },[])
   return (
     <div className="flex justify-center items-center min-h-screen p-4">
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-5 sm:p-8 space-y-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-600"
+        className="w-full max-w-md p-5 sm:p-8 space-y-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-700"
       >
         <motion.div 
           className="text-center"
@@ -192,7 +224,7 @@ const DarkRegistrationForm = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSubmitted(false)}
-              className="mt-6 px-4 py-2 bg-indigo-600 text-gray-100 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               Back to form
             </motion.button>
@@ -221,7 +253,11 @@ const DarkRegistrationForm = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium">Registration failed</p>
-                      <p className="text-xs mt-1">Please try again later.</p>
+                      <p className="text-xs mt-1">
+                        {errors.email === "Email already registered" 
+                          ? "This email is already registered." 
+                          : "Please check your information and try again."}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -263,18 +299,37 @@ const DarkRegistrationForm = () => {
                   type="email"
                   value={formData.repeatEmail}
                   onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  className={`mt-1 block w-full px-3 py-2 bg-gray-700 border ${errors.repeatEmail === "repeat_email_required" ? "border-red-500" : "border-gray-600"} rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200`}
                   placeholder="your@email.com"
                 />
-                {errors.repeatEmail && (
-                  <motion.p 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="mt-2 text-sm text-red-400"
-                  >
-                    {errors.repeatEmail}
-                  </motion.p>
-                )}
+                <AnimatePresence>
+                  {errors.repeatEmail === "repeat_email_required" && (
+                    <motion.div 
+                      variants={repeatEmailErrorVariant}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      className="mt-2 bg-red-900/40 border border-red-600 rounded-lg px-3 py-2"
+                    >
+                      <div className="flex items-center">
+                        <svg className="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <span className="text-sm font-medium text-red-300">Email confirmation required</span>
+                      </div>
+                      <p className="text-xs text-red-300 mt-1 ml-7">Please enter your email address again to confirm.</p>
+                    </motion.div>
+                  )}
+                  {errors.repeatEmail && errors.repeatEmail !== "repeat_email_required" && (
+                    <motion.p 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="mt-2 text-sm text-red-400"
+                    >
+                      {errors.repeatEmail}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               <motion.div variants={itemVariants}>
@@ -332,10 +387,10 @@ const DarkRegistrationForm = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-gray-100 ${isLoading ? 'bg-indigo-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-800 transition-all duration-200`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${isLoading ? 'bg-indigo-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-800 transition-all duration-200`}
               >
                 {isLoading ? (
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>

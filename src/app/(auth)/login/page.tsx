@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoginFunction } from '@/lib/auth/action';
+import { LoginFunction } from '@/lib/auth/login/action';
 import { useRouter } from 'next/navigation';
 const DarkLoginForm = () => {
 
