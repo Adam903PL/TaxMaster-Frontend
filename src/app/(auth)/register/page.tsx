@@ -1,21 +1,24 @@
 'use client'
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoginFunction } from '@/lib/auth/action';
-import { useRouter } from 'next/navigation';
-const DarkLoginForm = () => {
+// import { useRouter } from 'next/navigation';
 
-  const router = useRouter();
+const DarkRegistrationForm = () => {
+//   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    repeatEmail: "",
+    password: "",
+    repeatPassword: ""
   });
   const [errors, setErrors] = useState({
     email: "",
-    password: ""
+    repeatEmail: "",
+    password: "",
+    repeatPassword: ""
   });
   const [submitted, setSubmitted] = useState(false);
-  const [loginError, setLoginError] = useState(false);
+  const [registrationError, setRegistrationError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -24,17 +27,20 @@ const DarkLoginForm = () => {
       ...formData,
       [name]: value
     });
-    // Clear any login error when user starts typing again
-    if (loginError) setLoginError(false);
+    // Clear any registration error when user starts typing again
+    if (registrationError) setRegistrationError(false);
   };
 
   const validateForm = () => {
     let valid = true;
     const newErrors = {
       email: "",
-      password: ""
+      repeatEmail: "",
+      password: "",
+      repeatPassword: ""
     };
 
+    // Email validation
     if (!formData.email) {
       newErrors.email = "Email is required";
       valid = false;
@@ -43,11 +49,30 @@ const DarkLoginForm = () => {
       valid = false;
     }
     
+    // Repeat Email validation
+    if (!formData.repeatEmail) {
+      newErrors.repeatEmail = "Repeat email is required";
+      valid = false;
+    } else if (formData.email !== formData.repeatEmail) {
+      newErrors.repeatEmail = "Emails do not match";
+      valid = false;
+    }
+    
+    // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
       valid = false;
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+    
+    // Repeat Password validation
+    if (!formData.repeatPassword) {
+      newErrors.repeatPassword = "Repeat password is required";
+      valid = false;
+    } else if (formData.password !== formData.repeatPassword) {
+      newErrors.repeatPassword = "Passwords do not match";
       valid = false;
     }
 
@@ -58,24 +83,18 @@ const DarkLoginForm = () => {
   const handleSubmit = async () => {
     if (validateForm()) {
       setIsLoading(true);
-      setLoginError(false);
+      setRegistrationError(false);
       
       try {
-
-        const resp = await LoginFunction(formData);
-
-        if (resp) {
+        // For now, just simulate a successful registration
+        // In a real application, you would call a registration API here
+        setTimeout(() => {
+          console.log("Registration data:", formData);
           setSubmitted(true);
-          setTimeout(() => {
-            router.push('/home'); 
-          }, 2000);
-        } else {
-          setLoginError(true);
-        }
+          setIsLoading(false);
+        }, 1500);
       } catch (error) {
-        console.log(error,"error handle submit DarkLoginForm")
-        setLoginError(true);
-      } finally {
+        setRegistrationError(true);
         setIsLoading(false);
       }
     }
@@ -144,8 +163,8 @@ const DarkLoginForm = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-100">Login</h2>
-          <p className="mt-2 text-sm text-gray-400">Enter your credentials</p>
+          <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-100">Register</h2>
+          <p className="mt-2 text-sm text-gray-400">Create your account</p>
         </motion.div>
         
         {submitted ? (
@@ -166,8 +185,8 @@ const DarkLoginForm = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </motion.div>
-              <p className="font-medium text-lg">Login successful!</p>
-              <p className="text-sm mt-2">Welcome back, {formData.email}</p>
+              <p className="font-medium text-lg">Registration successful!</p>
+              <p className="text-sm mt-2">Welcome, {formData.email}</p>
             </div>
             <motion.button 
               whileHover={{ scale: 1.05 }}
@@ -186,7 +205,7 @@ const DarkLoginForm = () => {
             animate="visible"
           >
             <AnimatePresence>
-              {loginError && (
+              {registrationError && (
                 <motion.div
                   variants={errorVariants}
                   initial="initial"
@@ -201,8 +220,8 @@ const DarkLoginForm = () => {
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium">Login failed</p>
-                      <p className="text-xs mt-1">Invalid email or password. Please try again.</p>
+                      <p className="text-sm font-medium">Registration failed</p>
+                      <p className="text-xs mt-1">Please try again later.</p>
                     </div>
                   </div>
                 </motion.div>
@@ -235,6 +254,30 @@ const DarkLoginForm = () => {
               </motion.div>
 
               <motion.div variants={itemVariants}>
+                <label htmlFor="repeatEmail" className="block text-sm font-medium text-gray-300">
+                  Repeat Email address
+                </label>
+                <input
+                  id="repeatEmail"
+                  name="repeatEmail"
+                  type="email"
+                  value={formData.repeatEmail}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  placeholder="your@email.com"
+                />
+                {errors.repeatEmail && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="mt-2 text-sm text-red-400"
+                  >
+                    {errors.repeatEmail}
+                  </motion.p>
+                )}
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                   Password
                 </label>
@@ -257,29 +300,30 @@ const DarkLoginForm = () => {
                   </motion.p>
                 )}
               </motion.div>
-            </motion.div>
 
-            <motion.div 
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0 mt-4"
-            >
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 bg-gray-700 border-gray-600 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
-                  Remember me
+              <motion.div variants={itemVariants}>
+                <label htmlFor="repeatPassword" className="block text-sm font-medium text-gray-300">
+                  Repeat Password
                 </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
-                  Forgot your password?
-                </a>
-              </div>
+                <input
+                  id="repeatPassword"
+                  name="repeatPassword"
+                  type="password"
+                  value={formData.repeatPassword}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  placeholder="••••••••"
+                />
+                {errors.repeatPassword && (
+                  <motion.p 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="mt-2 text-sm text-red-400"
+                  >
+                    {errors.repeatPassword}
+                  </motion.p>
+                )}
+              </motion.div>
             </motion.div>
 
             <motion.div variants={itemVariants}>
@@ -296,7 +340,7 @@ const DarkLoginForm = () => {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : null}
-                {isLoading ? 'Signing in...' : 'Sign in'}
+                {isLoading ? 'Registering...' : 'Register'}
               </motion.button>
             </motion.div>
             
@@ -305,9 +349,9 @@ const DarkLoginForm = () => {
               className="text-center mt-5"
             >
               <p className="text-sm text-gray-400">
-                {`Don't`} have an account?{" "}
-                <a href="/register" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
-                  Sign up
+                Already have an account?{" "}
+                <a href="/login" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+                  Sign in
                 </a>
               </p>
             </motion.div>
@@ -318,4 +362,4 @@ const DarkLoginForm = () => {
   );
 };
 
-export default DarkLoginForm;
+export default DarkRegistrationForm;
