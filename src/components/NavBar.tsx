@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faEnvelope, 
+  faGamepad,
   faBars, 
   faTimes,
   faShoppingCart,
@@ -20,6 +20,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { logOut } from '@/lib/auth/logout/action';
 import { useRouter } from "next/navigation";
+import { searchContent, SearchResult } from '@/services/search';
+
 // Define types
 type NavLink = {
   name: string;
@@ -42,6 +44,8 @@ const FloatingNavbar: React.FC = () => {
   const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
   const [isMobileSearchActive, setIsMobileSearchActive] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState<boolean>(false);
   const [notificationsOpen, setNotificationsOpen] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([
@@ -133,13 +137,26 @@ const FloatingNavbar: React.FC = () => {
   }, [isSearchActive, searchQuery]);
   
   // Handle search submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = () => {
     if (searchQuery.trim()) {
-      // Implement search functionality here
-      console.log('Searching for:', searchQuery);
-      // You could redirect to search results page or show results
-      // window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+      const results = searchContent(searchQuery);
+      setSearchResults(results);
+      setShowResults(true);
+    }
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    if (value.trim()) {
+      const results = searchContent(value);
+      setSearchResults(results);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
     }
   };
 
@@ -161,7 +178,7 @@ const FloatingNavbar: React.FC = () => {
   // Navigation links
   const navLinks: NavLink[] = [
     { name: 'Dashboard', path: '/dashboard', icon: faChartLine },
-    { name: 'Messages', path: '/messages', icon: faEnvelope },
+    { name: 'Games', path: '/games', icon: faGamepad },
     { name: 'Orders', path: '/orders', icon: faClipboardList },
     { name: 'Shop', path: '/shop', icon: faShoppingCart },
   ];
@@ -226,18 +243,16 @@ const FloatingNavbar: React.FC = () => {
   const searchVariants = {
     closed: {
       width: '40px',
-      opacity: 0.9,
       transition: {
         duration: 0.3,
-        ease: 'easeInOut'
+        ease: [0.4, 0, 0.2, 1]
       }
     },
     open: {
-      width: '200px', // Increased width for better usability
-      opacity: 1,
+      width: '300px',
       transition: {
         duration: 0.3,
-        ease: 'easeOut'
+        ease: [0.4, 0, 0.2, 1]
       }
     }
   };
@@ -352,39 +367,81 @@ const FloatingNavbar: React.FC = () => {
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Search - Desktop version */}
             <motion.div 
-              className="relative z-10 hidden lg:inline-block"
-              initial="closed"
-              animate={isSearchActive ? "open" : "closed"}
-              variants={searchVariants}
+              className="relative z-50 hidden lg:flex items-center"
             >
-              <input 
-                type="text" 
-                placeholder={isSearchActive ? "Search..." : ""}
-                className="w-full pr-8 pl-3 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 border border-gray-600 text-sm transition-all duration-300"
-                onFocus={() => setIsSearchActive(true)}
-                onBlur={(e) => {
-                  // Only close if the input is empty
-                  if (!e.target.value) {
-                    setIsSearchActive(false);
-                  }
-                }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <motion.button 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => {
-                  // Toggle search active state when clicking the icon
-                  setIsSearchActive(!isSearchActive);
-                }}
+              <motion.div
+                className="relative flex items-center justify-end"
+                initial="closed"
+                animate={isSearchActive ? "open" : "closed"}
+                variants={searchVariants}
               >
-                <FontAwesomeIcon 
-                  icon={faSearch} 
-                  className="h-4 w-4 text-gray-400 hover:text-indigo-400 transition-colors duration-200" 
-                />
-              </motion.button>
+                {isSearchActive && (
+                  <input 
+                    ref={searchInputRef}
+                    type="text" 
+                    placeholder="Search..."
+                    className="w-full pr-8 pl-3 py-2 rounded-full bg-gray-700 border border-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    autoFocus
+                  />
+                )}
+                <motion.button 
+                  className="absolute right-0 p-2 hover:bg-gray-700 rounded-full"
+                  whileHover={{ scale: 0.9 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    if (!isSearchActive) {
+                      setIsSearchActive(true);
+                    } else if (!searchQuery) {
+                      setIsSearchActive(false);
+                      setShowResults(false);
+                    } else {
+                      handleSearch();
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon 
+                    icon={faSearch} 
+                    className="h-4 w-4 text-gray-400 hover:text-indigo-400 transition-colors duration-200" 
+                  />
+                </motion.button>
+              {showResults && (
+                <motion.div 
+                  className="absolute top-full left-0 right-0 mt-2"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {searchResults.length > 0 ? (
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+                      <div className="max-h-96 overflow-y-auto">
+                        {searchResults.map((result, index) => (
+                          <Link
+                            key={index}
+                            href={result.path}
+                            className="block p-4 hover:bg-gray-700 transition-colors border-b border-gray-700 last:border-0"
+                            onClick={() => {
+                              setShowResults(false);
+                              setSearchQuery('');
+                              setIsSearchActive(false);
+                            }}
+                          >
+                            <h4 className="text-indigo-400 font-semibold mb-1">{result.title}</h4>
+                            <p className="text-sm text-gray-300">{result.excerpt}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : searchQuery.trim().length >= 2 && (
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-4 text-center text-gray-400">
+                      No results found
+                    </div>
+                  )}
+                </motion.div>
+              )}
+              </motion.div>
             </motion.div>
             
             {/* Search - Mobile version (icon only) */}
@@ -526,27 +583,28 @@ const FloatingNavbar: React.FC = () => {
                         {user.role}
                       </div>
                     </div>
-                    
+
                     <div>
                       <Link href="/profile" passHref>
                         <div className="flex items-center px-4 py-2 hover:bg-gray-700 cursor-pointer">
-                          <FontAwesomeIcon icon={faUserCircle} className="h-4 w-4 text-gray-400 mr-3" />
+                          <FontAwesomeIcon icon={faUserCircle} className="h-4 w-4 text-gray-400 mr-3"/>
                           <span className="text-sm">Profile</span>
                         </div>
                       </Link>
                       <Link href="/settings" passHref>
                         <div className="flex items-center px-4 py-2 hover:bg-gray-700 cursor-pointer">
-                          <FontAwesomeIcon icon={faCog} className="h-4 w-4 text-gray-400 mr-3" />
+                          <FontAwesomeIcon icon={faCog} className="h-4 w-4 text-gray-400 mr-3"/>
                           <span className="text-sm">Settings</span>
                         </div>
                       </Link>
                       <div className="border-t border-gray-600 mt-1">
-                        <button onClick={()=>logOutFun()}>
-                          <div className="flex items-center px-4 py-2 hover:bg-gray-700 cursor-pointer text-red-400 hover:text-red-300">
-                            <FontAwesomeIcon icon={faSignOutAlt} className="h-4 w-4 mr-3" />
-                            <span className="text-sm">Sign out</span>
-                          </div>
-                        </button>
+                        <div
+                            onClick={() => logOutFun()}
+                            className="flex items-center px-4 py-2 hover:bg-gray-700 cursor-pointer text-red-400 hover:text-red-300"
+                        >
+                          <FontAwesomeIcon icon={faSignOutAlt} className="h-4 w-4 mr-3"/>
+                          <span className="text-sm">Sign out</span>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -556,10 +614,10 @@ const FloatingNavbar: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsOpen(!isOpen)}
-              className="block lg:hidden p-1"
+                whileHover={{scale: 1.1}}
+                whileTap={{scale: 0.9}}
+                onClick={() => setIsOpen(!isOpen)}
+                className="block lg:hidden p-1"
             >
               <FontAwesomeIcon 
                 icon={isOpen ? faTimes : faBars} 
@@ -568,8 +626,8 @@ const FloatingNavbar: React.FC = () => {
             </motion.button>
           </div>
         </div>
-        
-        {/* Mobile Search Bar - Slides down */}
+
+        {/* Mobile Search Bar */}
         <AnimatePresence>
           {isMobileSearchActive && (
             <motion.div
@@ -577,28 +635,52 @@ const FloatingNavbar: React.FC = () => {
               initial="closed"
               animate="open"
               exit="closed"
-              className="lg:hidden overflow-hidden mt-3 bg-gray-700 rounded-lg px-4 py-3"
+              className="w-full mt-4"
             >
               <div className="relative search-area">
-                <input 
-                  type="text" 
+                <input
+                  ref={searchInputRef}
+                  type="text"
                   placeholder="Search..."
-                  className="w-full pr-10 pl-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-800 border border-gray-600 text-sm"
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
+                  onChange={handleSearchChange}
                 />
-                <motion.button 
+                <button 
                   className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
                   onClick={handleSearch}
                 >
                   <FontAwesomeIcon 
                     icon={faSearch} 
                     className="h-4 w-4 text-gray-400 hover:text-indigo-400 transition-colors duration-200" 
                   />
-                </motion.button>
+                </button>
+                {showResults && searchResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden z-50">
+                    <div className="max-h-96 overflow-y-auto">
+                      {searchResults.map((result, index) => (
+                        <Link
+                          key={index}
+                          href={result.path}
+                          className="block p-4 hover:bg-gray-700 transition-colors border-b border-gray-700 last:border-0"
+                          onClick={() => {
+                            setShowResults(false);
+                            setSearchQuery('');
+                            setIsMobileSearchActive(false);
+                          }}
+                        >
+                          <h4 className="text-indigo-400 font-semibold mb-1">{result.title}</h4>
+                          <p className="text-sm text-gray-300">{result.excerpt}</p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {showResults && searchResults.length === 0 && searchQuery.trim().length >= 2 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-4 text-center text-gray-400">
+                    No results found
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

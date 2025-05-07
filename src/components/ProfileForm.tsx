@@ -10,7 +10,9 @@ import {
     faCalendarWeek,
     faListUl,
     faFileAlt,
-    faCheck
+    faCheck,
+    faCamera,
+    faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,6 +27,7 @@ export const ProfileForm = () => {
         weeklyGoal: number;
         interests: string[];
         bio: string;
+        profilePicture?: File;
     }
 
     interface FormErrors {
@@ -43,11 +46,13 @@ export const ProfileForm = () => {
         knowledgeLevel: "beginner",
         weeklyGoal: 3,
         interests: [],
-        bio: ""
+        bio: "",
+        profilePicture: undefined
     });
 
     const [errors, setErrors] = useState<FormErrors>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string>('');
 
     interface InterestOption {
         id: string;
@@ -68,10 +73,10 @@ export const ProfileForm = () => {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: name === 'weeklyGoal' ? Number(value) : value
-        });
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'weeklyGoal' ? parseInt(value, 10) : value
+        }));
     };
 
     const handleInterestChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +91,21 @@ export const ProfileForm = () => {
                 ...formData,
                 interests: formData.interests.filter(interest => interest !== value)
             });
+        }
+    };
+
+    const handleProfilePictureChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFormData({
+                ...formData,
+                profilePicture: file
+            });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -164,14 +184,51 @@ export const ProfileForm = () => {
     return (
         <div className="w-full px-4 py-8">
             <div className="max-w-2xl mx-auto p-8 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl text-gray-100">
-            <motion.h2
-                className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-            >
-                Your Financial Profile
-            </motion.h2>
+                <motion.h2
+                    className="text-2xl font-bold mb-6"
+                >
+                    Profile Settings
+                </motion.h2>
+
+                <motion.div className="mb-8 flex flex-col items-center" variants={itemVariants}>
+                    <div className="relative group">
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-indigo-500 shadow-lg mb-4">
+                            {previewUrl ? (
+                                <img 
+                                    src={previewUrl} 
+                                    alt="Profile" 
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                                    <FontAwesomeIcon icon={faUser} className="text-4xl text-gray-400" />
+                                </div>
+                            )}
+                        </div>
+                        <label className="absolute bottom-4 right-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-indigo-600 transition-colors shadow-lg group-hover:scale-110 transform transition-transform">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleProfilePictureChange}
+                            />
+                            <FontAwesomeIcon icon={faCamera} className="text-white text-sm" />
+                        </label>
+                        {previewUrl && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setPreviewUrl('');
+                                    setFormData(prev => ({ ...prev, profilePicture: undefined }));
+                                }}
+                                className="absolute -bottom-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
+                            >
+                                <FontAwesomeIcon icon={faTrash} className="text-white text-sm" />
+                            </button>
+                        )}
+                    </div>
+                    <p className="text-sm text-gray-400 mt-2">Click the camera icon to change profile picture</p>
+                </motion.div>
 
             <AnimatePresence mode="wait">
                 {isSubmitted ? (
