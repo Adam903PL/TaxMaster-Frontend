@@ -63,13 +63,13 @@ const NotFound = () => {
 
         {/* Button */}
         <motion.div variants={itemVariants}>
-          <Link href="/home">
+          <Link href="/dashboard">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              Back to Home
+              Back to Dashboard
             </motion.button>
           </Link>
         </motion.div>

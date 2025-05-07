@@ -69,7 +69,7 @@ const DarkLoginForm = () => {
         if (resp) {
           setSubmitted(true);
           setTimeout(() => {
-            router.push('/home'); 
+            router.push('/dashboard'); 
           }, 2000);
         } else {
           setLoginError(true);

@@ -23,9 +23,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
-  
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-gray-900 text-gray-100 relative overflow-x-hidden">
