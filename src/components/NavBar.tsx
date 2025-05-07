@@ -317,7 +317,7 @@ const FloatingNavbar: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              DarkUI
+              TaxMaster
             </motion.span>
           </Link>
 
