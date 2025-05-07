@@ -52,13 +52,12 @@ export const SettingsForm = () => {
 
     const submitSettingsForm = async (data: FormData) => {
         try {
-            // TODO: Replace with actual API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('Settings updated:', data);
+            const onSubmit = (data: FormData) => {
+                console.log('Saved settings:', data);
+            };
             setIsSubmitted(true);
         } catch (error) {
             console.error('Failed to update settings:', error);
-            // TODO: Add error handling
         }
     };
 
@@ -67,7 +66,6 @@ export const SettingsForm = () => {
         setIsSubmitted(false);
     };
 
-    // Animacje
     const formVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
@@ -112,12 +110,9 @@ export const SettingsForm = () => {
         <div className="w-full px-4 py-8">
             <div className="max-w-2xl mx-auto p-8 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl text-gray-100">
                 <motion.h2
-                    className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1, duration: 0.6 }}
+                    className="text-2xl font-bold mb-6"
                 >
-                    Ustawienia konta
+                    Account Settings
                 </motion.h2>
 
                 <AnimatePresence mode="wait">
@@ -134,14 +129,14 @@ export const SettingsForm = () => {
                                     <FontAwesomeIcon icon={faCheck} className="h-6 w-6 text-white" />
                                 </div>
                             </div>
-                            <p className="text-indigo-200 text-center font-medium mb-4">Ustawienia zostały zaktualizowane pomyślnie!</p>
+                            <p className="text-indigo-200 text-center font-medium mb-4">Settings updated successfully!</p>
                             <motion.button
                                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-indigo-500/25"
                                 onClick={handleReset}
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                             >
-                                Wróć do ustawień
+                                Back to settings
                             </motion.button>
                         </motion.div>
                     ) : (
@@ -151,26 +146,25 @@ export const SettingsForm = () => {
                             initial="hidden"
                             animate="visible"
                         >
-                            {/* Sekcja konta */}
                             <div className="mb-8">
                                 <h3 className="text-xl font-semibold mb-4 text-indigo-300 border-b border-gray-700 pb-2">
-                                    Konto
+                                    Account
                                 </h3>
 
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-indigo-400" />
-                                        Adres email
+                                        Email address
                                     </label>
                                     <input
                                         type="email"
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                        placeholder="twoj@email.com"
+                                        placeholder="your@email.com"
                                         {...register("email", {
-                                            required: "Email jest wymagany",
+                                            required: "Email is required",
                                             pattern: {
                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                message: "Niepoprawny format adresu email"
+                                                message: "Invalid email format"
                                             }
                                         })}
                                     />
@@ -182,14 +176,14 @@ export const SettingsForm = () => {
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faLock} className="mr-2 text-indigo-400" />
-                                        Aktualne hasło
+                                        Current password
                                     </label>
                                     <input
                                         type="password"
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                        placeholder="Obecne hasło"
+                                        placeholder="Enter current password"
                                         {...register("currentPassword", {
-                                            required: "Aktualne hasło jest wymagane do zmiany hasła"
+                                            required: "Current password is required to change password"
                                         })}
                                     />
                                     {errors.currentPassword && (
@@ -200,20 +194,20 @@ export const SettingsForm = () => {
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faLock} className="mr-2 text-indigo-400" />
-                                        Nowe hasło
+                                        New password
                                     </label>
                                     <input
                                         type="password"
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                        placeholder="Nowe hasło"
+                                        placeholder="Enter new password"
                                         {...register("newPassword", {
                                             minLength: {
                                                 value: 8,
-                                                message: "Hasło musi mieć co najmniej 8 znaków"
+                                                message: "Password must be at least 8 characters"
                                             },
                                             pattern: {
                                                 value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                                                message: "Hasło powinno zawierać dużą i małą literę, cyfrę oraz znak specjalny"
+                                                message: "Password should contain uppercase and lowercase letters, a number and a special character"
                                             }
                                         })}
                                     />
@@ -225,15 +219,15 @@ export const SettingsForm = () => {
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faLock} className="mr-2 text-indigo-400" />
-                                        Powtórz nowe hasło
+                                        Confirm new password
                                     </label>
                                     <input
                                         type="password"
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                        placeholder="Powtórz nowe hasło"
+                                        placeholder="Confirm new password"
                                         {...register("confirmPassword", {
                                             validate: value =>
-                                                value === watchNewPassword || "Hasła nie są identyczne"
+                                                value === watchNewPassword || "Passwords do not match"
                                         })}
                                     />
                                     {errors.confirmPassword && (
@@ -242,25 +236,24 @@ export const SettingsForm = () => {
                                 </motion.div>
                             </div>
 
-                            {/* Sekcja powiadomień */}
                             <div className="mb-8">
                                 <h3 className="text-xl font-semibold mb-4 text-indigo-300 border-b border-gray-700 pb-2">
-                                    Powiadomienia
+                                    Notifications
                                 </h3>
 
                                 <motion.div className="mb-4" variants={itemVariants}>
                                     <div className="flex items-center justify-between p-4 bg-gray-700/50 border border-gray-600 rounded-xl">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faBell} className="text-indigo-400 mr-3" />
-                                            <span>Włącz powiadomienia</span>
+                                            <span>Enable notifications</span>
                                         </div>
-                                        <label className="relative inline-flex items-center cursor-pointer">
+                                        <label className="flex items-center space-x-3 cursor-pointer">
                                             <input
                                                 type="checkbox"
-                                                className="sr-only peer"
-                                                {...register("enableNotifications")}
+                                                {...register('enableNotifications')}
+                                                className="form-checkbox h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
                                             />
-                                            <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                                            <span>Enable Notifications</span>
                                         </label>
                                     </div>
                                 </motion.div>
@@ -269,7 +262,7 @@ export const SettingsForm = () => {
                                     <div className="flex items-center justify-between p-4 bg-gray-700/50 border border-gray-600 rounded-xl">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faClock} className="text-indigo-400 mr-3" />
-                                            <span>Codzienne przypomnienie o nauce</span>
+                                            <span>Daily reminder</span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input
@@ -286,7 +279,7 @@ export const SettingsForm = () => {
                                     <div className="flex items-center justify-between p-4 bg-gray-700/50 border border-gray-600 rounded-xl">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faChartLine} className="text-indigo-400 mr-3" />
-                                            <span>Tygodniowy raport postępów</span>
+                                            <span>Weekly report</span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input
@@ -303,7 +296,7 @@ export const SettingsForm = () => {
                                     <div className="flex items-center justify-between p-4 bg-gray-700/50 border border-gray-600 rounded-xl">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faBell} className="text-indigo-400 mr-3" />
-                                            <span>Powiadomienia o wyzwaniach</span>
+                                            <span>Challenge alerts</span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input
@@ -317,56 +310,55 @@ export const SettingsForm = () => {
                                 </motion.div>
                             </div>
 
-                            {/* Sekcja preferencji */}
                             <div className="mb-8">
                                 <h3 className="text-xl font-semibold mb-4 text-indigo-300 border-b border-gray-700 pb-2">
-                                    Preferencje
+                                    Preferences
                                 </h3>
 
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faLanguage} className="mr-2 text-indigo-400" />
-                                        Język
+                                        Language
                                     </label>
                                     <select
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100"
                                         {...register("language")}
                                     >
-                                        <option value="pl">Polski</option>
-                                        <option value="en">Angielski</option>
-                                        <option value="de">Niemiecki</option>
-                                        <option value="fr">Francuski</option>
+                                        <option value="en">English</option>
+                                        <option value="pl">Polish</option>
+                                        <option value="de">German</option>
+                                        <option value="fr">French</option>
                                     </select>
                                 </motion.div>
 
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faPalette} className="mr-2 text-indigo-400" />
-                                        Motyw
+                                        Theme
                                     </label>
                                     <select
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100"
                                         {...register("theme")}
                                     >
-                                        <option value="dark">Ciemny</option>
-                                        <option value="light">Jasny</option>
-                                        <option value="system">Systemowy</option>
+                                        <option value="dark">Dark</option>
+                                        <option value="light">Light</option>
+                                        <option value="system">System</option>
                                     </select>
                                 </motion.div>
 
                                 <motion.div className="mb-6" variants={itemVariants}>
                                     <label className="block text-sm font-medium mb-2 text-gray-300">
                                         <FontAwesomeIcon icon={faChartLine} className="mr-2 text-indigo-400" />
-                                        Waluta
+                                        Currency
                                     </label>
                                     <select
                                         className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100"
                                         {...register("currencyDisplay")}
                                     >
-                                        <option value="PLN">PLN (zł)</option>
-                                        <option value="EUR">EUR (€)</option>
                                         <option value="USD">USD ($)</option>
+                                        <option value="EUR">EUR (€)</option>
                                         <option value="GBP">GBP (£)</option>
+                                        <option value="PLN">PLN (zł)</option>
                                     </select>
                                 </motion.div>
 
@@ -374,7 +366,7 @@ export const SettingsForm = () => {
                                     <div className="flex items-center justify-between p-4 bg-gray-700/50 border border-gray-600 rounded-xl">
                                         <div className="flex items-center">
                                             <FontAwesomeIcon icon={faShieldAlt} className="text-indigo-400 mr-3" />
-                                            <span>Tryb prywatny (ukryj postępy przed innymi)</span>
+                                            <span>Privacy Mode (hide progress from others)</span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input
@@ -395,7 +387,7 @@ export const SettingsForm = () => {
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
                                 >
-                                    Zapisz zmiany
+                                    Save Changes
                                 </motion.button>
                                 <motion.button
                                     type="button"
@@ -404,7 +396,7 @@ export const SettingsForm = () => {
                                     whileHover={{ scale: 1.03 }}
                                     whileTap={{ scale: 0.97 }}
                                 >
-                                    Anuluj
+                                    Cancel
                                 </motion.button>
                             </motion.div>
                         </motion.form>

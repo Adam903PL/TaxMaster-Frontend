@@ -54,23 +54,23 @@ export const ProfileForm = () => {
         label: string;
     }
 
-    // Lista zainteresowań finansowych/ekonomicznych
+    // List of financial/economic interests
     const interestOptions: InterestOption[] = [
-        { id: "investing", label: "Inwestowanie" },
-        { id: "savings", label: "Oszczędzanie" },
-        { id: "budgeting", label: "Budżetowanie" },
-        { id: "stocks", label: "Giełda" },
-        { id: "crypto", label: "Kryptowaluty" },
-        { id: "retirement", label: "Emerytura" },
-        { id: "taxes", label: "Podatki" },
-        { id: "business", label: "Przedsiębiorczość" }
+        { id: "investing", label: "Investing" },
+        { id: "savings", label: "Savings" },
+        { id: "budgeting", label: "Budgeting" },
+        { id: "stocks", label: "Stock Market" },
+        { id: "crypto", label: "Cryptocurrencies" },
+        { id: "retirement", label: "Retirement" },
+        { id: "taxes", label: "Taxes" },
+        { id: "business", label: "Entrepreneurship" }
     ];
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
-            [name]: value
+            [name]: name === 'weeklyGoal' ? Number(value) : value
         });
     };
 
@@ -91,16 +91,16 @@ export const ProfileForm = () => {
 
     const validateForm = (): FormErrors => {
         let tempErrors: FormErrors = {};
-        if (!formData.firstName.trim()) tempErrors.firstName = "Imię jest wymagane";
-        if (!formData.lastName.trim()) tempErrors.lastName = "Nazwisko jest wymagane";
+        if (!formData.firstName.trim()) tempErrors.firstName = "First name is required";
+        if (!formData.lastName.trim()) tempErrors.lastName = "Last name is required";
         if (!formData.email.trim()) {
-            tempErrors.email = "Email jest wymagany";
+            tempErrors.email = "Email is required";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            tempErrors.email = "Niepoprawny format email";
+            tempErrors.email = "Invalid email format";
         }
 
         if (formData.age && isNaN(Number(formData.age))) {
-            tempErrors.age = "Wiek musi być liczbą";
+            tempErrors.age = "Age must be a number";
         }
 
         return tempErrors;
@@ -112,7 +112,7 @@ export const ProfileForm = () => {
 
         if (Object.keys(validationErrors).length === 0) {
             // Tutaj można dodać logikę wysyłania danych do API
-            console.log("Dane do wysłania:", formData);
+            console.log("Data to send:", formData);
             setIsSubmitted(true);
             setErrors({});
         } else {
@@ -170,7 +170,7 @@ export const ProfileForm = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.6 }}
             >
-                Twój profil finansowy
+                Your Financial Profile
             </motion.h2>
 
             <AnimatePresence mode="wait">
@@ -187,14 +187,14 @@ export const ProfileForm = () => {
                                 <FontAwesomeIcon icon={faCheck} className="h-6 w-6 text-white" />
                             </div>
                         </div>
-                        <p className="text-indigo-200 text-center font-medium mb-4">Profil został zaktualizowany pomyślnie!</p>
+                        <p className="text-indigo-200 text-center font-medium mb-4">Profile updated successfully!</p>
                         <motion.button
                             className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-indigo-500/25"
                             onClick={(e: React.MouseEvent<HTMLButtonElement>) => setIsSubmitted(false)}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                         >
-                            Edytuj ponownie
+                            Edit Again
                         </motion.button>
                     </motion.div>
                 ) : (
@@ -207,7 +207,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faUser} className="mr-2 text-indigo-400" />
-                                Imię
+                                First Name
                             </label>
                             <input
                                 type="text"
@@ -215,7 +215,7 @@ export const ProfileForm = () => {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                placeholder="Wpisz swoje imię"
+                                placeholder="Enter your first name"
                             />
                             {errors.firstName && <p className="text-red-400 text-sm mt-1">{errors.firstName}</p>}
                         </motion.div>
@@ -223,7 +223,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faUser} className="mr-2 text-indigo-400" />
-                                Nazwisko
+                                Last Name
                             </label>
                             <input
                                 type="text"
@@ -231,7 +231,7 @@ export const ProfileForm = () => {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                placeholder="Wpisz swoje nazwisko"
+                                placeholder="Enter your last name"
                             />
                             {errors.lastName && <p className="text-red-400 text-sm mt-1">{errors.lastName}</p>}
                         </motion.div>
@@ -247,7 +247,7 @@ export const ProfileForm = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                placeholder="twoj@email.com"
+                                placeholder="your@email.com"
                             />
                             {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
                         </motion.div>
@@ -255,7 +255,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faBirthdayCake} className="mr-2 text-indigo-400" />
-                                Wiek (opcjonalnie)
+                                Age (optional)
                             </label>
                             <input
                                 type="text"
@@ -263,7 +263,7 @@ export const ProfileForm = () => {
                                 value={formData.age}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
-                                placeholder="Twój wiek"
+                                placeholder="Your age"
                             />
                             {errors.age && <p className="text-red-400 text-sm mt-1">{errors.age}</p>}
                         </motion.div>
@@ -271,7 +271,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faChartLine} className="mr-2 text-indigo-400" />
-                                Główny cel finansowy
+                                Main Financial Goal
                             </label>
                             <select
                                 name="financialGoal"
@@ -279,18 +279,18 @@ export const ProfileForm = () => {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
                             >
-                                <option value="savings">Oszczędzanie</option>
-                                <option value="investing">Inwestowanie</option>
-                                <option value="debt">Spłata długów</option>
-                                <option value="retirement">Planowanie emerytury</option>
-                                <option value="business">Założenie firmy</option>
+                                <option value="savings">Savings</option>
+                                <option value="investing">Investing</option>
+                                <option value="debt">Debt Repayment</option>
+                                <option value="retirement">Retirement Planning</option>
+                                <option value="business">Starting a Business</option>
                             </select>
                         </motion.div>
 
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faGraduationCap} className="mr-2 text-indigo-400" />
-                                Poziom wiedzy finansowej
+                                Financial Knowledge Level
                             </label>
                             <select
                                 name="knowledgeLevel"
@@ -298,16 +298,16 @@ export const ProfileForm = () => {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
                             >
-                                <option value="beginner">Początkujący</option>
-                                <option value="intermediate">Średniozaawansowany</option>
-                                <option value="advanced">Zaawansowany</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
                             </select>
                         </motion.div>
 
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faCalendarWeek} className="mr-2 text-indigo-400" />
-                                Cel tygodniowy (lekcje)
+                                Weekly Goal (lessons)
                             </label>
                             <div className="flex items-center">
                                 <input
@@ -326,7 +326,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faListUl} className="mr-2 text-indigo-400" />
-                                Obszary zainteresowań
+                                Areas of Interest
                             </label>
                             <div className="grid grid-cols-2 gap-2 p-3 bg-gray-700 border border-gray-600 rounded-lg">
                                 {interestOptions.map(option => (
@@ -348,7 +348,7 @@ export const ProfileForm = () => {
                         <motion.div className="mb-6" variants={itemVariants}>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 <FontAwesomeIcon icon={faFileAlt} className="mr-2 text-indigo-400" />
-                                Krótki opis (bio)
+                                Short Description (bio)
                             </label>
                             <textarea
                                 name="bio"
@@ -356,7 +356,7 @@ export const ProfileForm = () => {
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 bg-gray-700/75 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-100 placeholder:text-gray-400"
                                 rows="3"
-                                placeholder="Napisz coś o sobie i swoich celach finansowych..."
+                                placeholder="Write something about yourself and your financial goals..."
                             ></textarea>
                         </motion.div>
 
@@ -367,7 +367,7 @@ export const ProfileForm = () => {
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                             >
-                                Zapisz profil
+                                Save Profile
                             </motion.button>
                         </motion.div>
                     </motion.form>
