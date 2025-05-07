@@ -3,13 +3,17 @@ import { useAuthStore } from '@/hooks/useAuth';
 interface FormData {
   email: string;
   password: string;
+  rememberMe:boolean
 }
+
+
 
 export const LoginFunction = async (data: FormData) => {
   try {
     const body = JSON.stringify({
       email: data.email,
       password: data.password,
+      rememberMe: data.rememberMe
     });
     
 

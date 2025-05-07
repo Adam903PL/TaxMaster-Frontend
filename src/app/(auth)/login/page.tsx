@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoginFunction } from '@/lib/auth/login/action';
 import { useRouter } from 'next/navigation';
+
 const DarkLoginForm = () => {
 
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
+    rememberMe: false
   });
   const [errors, setErrors] = useState({
     email: "",
@@ -19,10 +21,10 @@ const DarkLoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     });
     // Clear any login error when user starts typing again
     if (loginError) setLoginError(false);
@@ -60,8 +62,8 @@ const DarkLoginForm = () => {
       setIsLoading(true);
       setLoginError(false);
       
-      try {
-
+      try { 
+        console.log(formData)
         const resp = await LoginFunction(formData);
 
         if (resp) {
@@ -208,7 +210,8 @@ const DarkLoginForm = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-
+            
+              
             <motion.div variants={itemVariants} className="space-y-4">
               <motion.div variants={itemVariants}>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300">
@@ -265,18 +268,20 @@ const DarkLoginForm = () => {
             >
               <div className="flex items-center">
                 <input
-                  id="remember-me"
-                  name="remember-me"
+                  id="rememberMe"
+                  name="rememberMe"
                   type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 bg-gray-700 border-gray-600 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-300">
                   Remember me
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
+                <a href="/forgot-password" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200">
                   Forgot your password?
                 </a>
               </div>

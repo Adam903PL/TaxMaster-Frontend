@@ -8,7 +8,7 @@ import type { NextRequest } from 'next/server';
 
 
 
-const NOT_PROTECTED = ['/login','/register']
+const NOT_PROTECTED = ['/login','/register','/forgot-password']
 
 
 

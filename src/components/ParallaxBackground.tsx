@@ -1,27 +1,20 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
-
-export default function Layout({ children }: LayoutProps) {
+export default function ParallaxBackground() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Sprawdzanie, czy urządzenie jest mobilne
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // Obsługa ruchu myszy dla efektu paralaksy
     const handleMouseMove = (e: MouseEvent) => {
       if (isMobile) return;
       setMousePosition({
@@ -30,7 +23,6 @@ export default function Layout({ children }: LayoutProps) {
       });
     };
 
-    // Obsługa przewijania dla efektów scrollowania
     const handleScroll = () => {
       setScrollPosition(window.scrollY);
     };
@@ -46,13 +38,10 @@ export default function Layout({ children }: LayoutProps) {
   }, [isMobile]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100 relative overflow-hidden">
-      {/* Animowane tło */}
+    <>
       <div className="fixed inset-0 z-0">
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 opacity-80"></div>
-        
-        {/* Animated circles */}
+
         <div 
           className="absolute w-96 h-96 rounded-full bg-purple-700/20 blur-3xl"
           style={{ 
@@ -61,6 +50,7 @@ export default function Layout({ children }: LayoutProps) {
             transform: `scale(${1 + scrollPosition * 0.0005})` 
           }}
         ></div>
+
         <div 
           className="absolute w-96 h-96 rounded-full bg-blue-700/20 blur-3xl"
           style={{ 
@@ -69,6 +59,7 @@ export default function Layout({ children }: LayoutProps) {
             transform: `scale(${1 + scrollPosition * 0.0003})` 
           }}
         ></div>
+
         <div 
           className="absolute w-96 h-96 rounded-full bg-indigo-700/20 blur-3xl"
           style={{ 
@@ -77,34 +68,26 @@ export default function Layout({ children }: LayoutProps) {
             transform: `scale(${1 + scrollPosition * 0.0007})` 
           }}
         ></div>
-        
-        {/* Animowane linie/siatka */}
-        <div className="absolute inset-0 opacity-10" 
-          style={{ backgroundImage: 'linear-gradient(to right, #6366f1 1px, transparent 1px), linear-gradient(to bottom, #6366f1 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
-          transform: `translate(${mousePosition.x * 10}px, ${mousePosition.y * 10}px)` }}>
-        </div>
-        
-        {/* Animowane gwiazdki - punkciki */}
+
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, #6366f1 1px, transparent 1px), linear-gradient(to bottom, #6366f1 1px, transparent 1px)',
+            backgroundSize: '80px 80px',
+            transform: `translate(${mousePosition.x * 10}px, ${mousePosition.y * 10}px)`
+          }}
+        ></div>
+
         <div className="stars absolute inset-0"></div>
       </div>
 
-
-
-      {/* Main content */}
-      <main className="flex-grow relative z-10">
-        {children}
-      </main>
-
-
-      {/* Style dla animacji */}
       <style jsx>{`
         @keyframes twinkling {
           0% { opacity: 0.3; }
           50% { opacity: 0.8; }
           100% { opacity: 0.3; }
         }
-        
         .stars {
           background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
                             radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
@@ -123,6 +106,6 @@ export default function Layout({ children }: LayoutProps) {
           animation: twinkling 8s infinite;
         }
       `}</style>
-    </div>
+    </>
   );
 }

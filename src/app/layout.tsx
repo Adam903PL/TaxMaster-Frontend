@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ParallaxBackground from "@/components/ParallaxBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,12 +23,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
+  
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className="min-h-screen flex flex-col bg-gray-900 text-gray-100 relative overflow-hidden">
+        <ParallaxBackground/>
+        <main className="flex-grow relative z-10">{children}</main>
       </body>
     </html>
   );
