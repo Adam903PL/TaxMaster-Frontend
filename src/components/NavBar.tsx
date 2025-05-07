@@ -74,12 +74,7 @@ const FloatingNavbar: React.FC = () => {
     [1, 0.95]
   );
   
-  const navbarBlur = useTransform(
-    scrollY, 
-    [0, 100], 
-    ['blur(0px)', 'blur(5px)']
-  );
-  
+
   const navbarScale = useTransform(
     scrollY, 
     [0, 100], 
@@ -283,12 +278,11 @@ const FloatingNavbar: React.FC = () => {
     <motion.header 
       className="fixed w-full z-50 top-0 left-0 px-4 sm:px-6 md:px-8 pt-4"
       variants={navbarVariants}
-      animate={visible ? "visible" : "hidden"}
+      animate={"visible"}
     >
       <motion.nav 
         style={{ 
           opacity: navbarOpacity, 
-          filter: navbarBlur,
           scale: navbarScale
         }}
         className="
@@ -698,18 +692,7 @@ const FloatingNavbar: React.FC = () => {
         </AnimatePresence>
       </motion.nav>
       
-      {/* Progress bar */}
-      <motion.div 
-        className="h-0.5 bg-indigo-500 mt-1 rounded-full max-w-7xl mx-auto"
-        style={{ 
-          scaleX: useTransform(
-            scrollY, 
-            [0, document.body?.scrollHeight - window.innerHeight || 1000], 
-            [0, 1]
-          ),
-          transformOrigin: "left" 
-        }}
-      />
+
     </motion.header>
   );
 };

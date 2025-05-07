@@ -27,7 +27,7 @@ export const LoginFunction = async (data: FormData) => {
       body
     });
     
-    const rawResponse = await resp.text();
+      const rawResponse = await resp.text();
 
     let responseData;
     try {
