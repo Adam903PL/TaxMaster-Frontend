@@ -40,9 +40,8 @@ const GameCharacter = () => {
                     strokeLinecap="round"
                 />
 
-                {/* Coin in hand (domyślna pozycja) */}
-                <circle cx="80" cy="120" r="10" fill="#EAB308" stroke="#CA8A04" strokeWidth="2" />
-                <text x="80" y="124" textAnchor="middle" fill="#78350F" fontWeight="bold" fontSize="12">$</text>
+                
+
             </motion.svg>
 
             {/* Dymek myślowy */}
@@ -50,10 +49,10 @@ const GameCharacter = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
-                className="absolute -top-12 -right-8 bg-white text-gray-800 p-2 rounded-lg w-40 text-center text-xs"
+                className="absolute -top-10 -right-8 bg-white text-gray-800 p-2 rounded-lg w-40 text-center text-xs"
             >
                 <div className="absolute -bottom-2 left-4 w-4 h-4 bg-white transform rotate-45"></div>
-                Wybierz odpowiedź i zatwierdź przyciskiem!
+                Choose your answer and confirm with the button!
             </motion.div>
         </div>
     );

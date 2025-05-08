@@ -1,24 +1,26 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import GameCharacter from '../../../components/GameCharacter';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
+import QuizGame from '@/components/games/QuizGame';
+import MemoryGame from '@/components/games/MemoryGame';
+import TradingSimulator from '@/components/games/TradingSimulator';
+import DailyChallenge from '@/components/games/DailyChallenge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGamepad, faTrophy, faChartLine, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
-interface Question {
-  text: string;
-  options: string[];
-  correctAnswer: number;
+interface Game {
+  id: string;
+  title: string;
+  description: string;
+  icon: IconDefinition;
+  component: React.ReactNode;
 }
 
 const GamesPage = () => {
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [score, setScore] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [coinPosition, setCoinPosition] = useState({ x: 40, y: 100 });
-  const gameContainerRef = useRef<HTMLDivElement>(null);
-  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
-  const sampleQuestions: Question[] = [
+  const sampleQuestions = [
     {
       text: "What is the capital of France?",
       options: ["London", "Berlin", "Paris", "Madrid"],
@@ -31,172 +33,103 @@ const GamesPage = () => {
     }
   ];
 
-  useEffect(() => {
-    // Reset references to options when question changes
-    optionRefs.current = optionRefs.current.slice(0, sampleQuestions[currentQuestion].options.length);
-    // Reset coin position when question changes
-    setCoinPosition({ x: 40, y: 100 });
-  }, [currentQuestion]);
-
-  // Update coin position when an option is selected
-  useEffect(() => {
-    if (selectedAnswer !== null && optionRefs.current[selectedAnswer]) {
-      const option = optionRefs.current[selectedAnswer];
-      const container = gameContainerRef.current;
-
-      if (option && container) {
-        const optionRect = option.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-
-        // Calculate the center position of the option relative to the container
-        const centerX = optionRect.left - containerRect.left + (optionRect.width / 2);
-        const centerY = optionRect.top - containerRect.top + (optionRect.height / 2);
-
-        // Adjust for the coin's size (16px radius) and add some offset to account for the character
-        setCoinPosition({
-          x: centerX - 400,
-          y: centerY - 100
-        });
-      }
+  const games: Game[] = [
+    {
+      id: 'quiz',
+      title: 'Financial Quiz',
+      description: 'Test your knowledge with interactive questions',
+      icon: faGraduationCap,
+      component: <QuizGame questions={sampleQuestions} onGameComplete={(score) => console.log(`Game completed with score: ${score}`)} />
+    },
+    {
+      id: 'memory',
+      title: 'Memory Cards',
+      description: 'Match financial terms with their definitions',
+      icon: faGamepad,
+      component: <MemoryGame onGameComplete={(moves) => console.log(`Game completed in ${moves} moves`)} />
+    },
+    {
+      id: 'trading',
+      title: 'Trading Simulator',
+      description: 'Practice trading in a risk-free environment',
+      icon: faChartLine,
+      component: <TradingSimulator />
+    },
+    {
+      id: 'challenge',
+      title: 'Daily Challenge',
+      description: 'Complete daily financial challenges',
+      icon: faTrophy,
+      component: <DailyChallenge />
     }
-  }, [selectedAnswer]);
-
-  const handleOptionClick = (optionIndex: number) => {
-    if (isAnswered) return;
-    setSelectedAnswer(optionIndex);
-  };
-
-  const handleSubmitAnswer = () => {
-    if (selectedAnswer === null || isAnswered) return;
-
-    setIsAnswered(true);
-
-    if (selectedAnswer === sampleQuestions[currentQuestion].correctAnswer) {
-      setScore(score + 1);
-    }
-
-    setTimeout(() => {
-      if (currentQuestion < sampleQuestions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer(null);
-        setIsAnswered(false);
-      }
-    }, 1500);
-  };
-
-  const getOptionClassName = (index: number) => {
-    if (!isAnswered) {
-      return selectedAnswer === index ? "bg-blue-600 border-2 border-yellow-500" : "bg-gray-700";
-    }
-    if (index === sampleQuestions[currentQuestion].correctAnswer) return "bg-green-600";
-    if (index === selectedAnswer) return "bg-red-600";
-    return "bg-gray-700";
-  };
+  ];
 
   return (
-      <div className="min-h-screen bg-gray-900 p-8 ">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center items-center min-h-screen p-4 mt-16">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-6xl p-5 sm:p-8 space-y-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-600"
-            >
-              <motion.div
-                  className="text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-              >
-                <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-100">Quiz Game</h2>
-                <p className="mt-2 text-sm text-gray-400">Choose a test to evaluate your skills</p>
-              </motion.div>
+    <div className="min-h-screen flex items-center justify-center p-4 pt-24">
+      <div className="w-full max-w-6xl">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full p-5 sm:p-8 space-y-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-600"
+        >
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">Learning Games</h2>
+            <p className="mt-2 text-sm text-gray-400">Choose a game to enhance your financial knowledge</p>
+          </motion.div>
 
-              <div className="relative bg-gray-800 rounded-lg p-6  shadow-xl text-white" ref={gameContainerRef}>
-                <div className="flex items-center justify-center mb-8 relative">
-                  <GameCharacter />
-
-                  {/* Coin with simplified animation */}
-                  <motion.div
-                      className="absolute z-10"
-                      initial={{ x: 40, y: 100, opacity: 1 }}
-                      animate={{
-                        x: coinPosition.x,
-                        y: coinPosition.y,
-                        opacity: 1
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 15,
-                        mass: 0.5
-                      }}
-                  >
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-600">
-                      <span className="text-yellow-900 font-bold text-xs">$</span>
+          {!selectedGame ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {games.map((game) => (
+                <motion.div
+                  key={game.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-gray-700/50 border border-gray-600 rounded-lg p-6 cursor-pointer hover:border-indigo-500 transition-all duration-300"
+                  onClick={() => setSelectedGame(game.id)}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+                      <FontAwesomeIcon icon={game.icon} className="text-xl text-white" />
                     </div>
-                  </motion.div>
-                </div>
-
-                <div className="space-y-8">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentQuestion}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="text-center mb-8"
-                    >
-                      <h2 className="text-2xl font-semibold mb-6">
-                        {sampleQuestions[currentQuestion].text}
-                      </h2>
-                      <div className="grid grid-cols-2 gap-4">
-                        {sampleQuestions[currentQuestion].options.map((option, index) => (
-                            <motion.button
-                                ref={(el) => {
-                                    optionRefs.current[index] = el;
-                                }}
-                                id={`option-${index}`}
-                                key={index}
-                                className={`p-4 pb-12 rounded-lg ${getOptionClassName(index)} hover:opacity-90 transition-colors`}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => handleOptionClick(index)}
-                                disabled={isAnswered}
-                            >
-                              {option}
-                            </motion.button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-
-                  <div className="text-center text-xl">
-                    Score: {score}/{sampleQuestions.length}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-100">{game.title}</h3>
+                      <p className="text-sm text-gray-400">{game.description}</p>
+                    </div>
                   </div>
-
-                  <div className="mt-8 flex justify-center">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`px-6 py-3 rounded-lg font-semibold text-white shadow-lg ${
-                            selectedAnswer !== null && !isAnswered
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-gray-600 cursor-not-allowed'
-                        }`}
-                        onClick={handleSubmitAnswer}
-                        disabled={selectedAnswer === null || isAnswered}
-                    >
-                      Submit Answer
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div>
+              <motion.button
+                onClick={() => setSelectedGame(null)}
+                className="mb-4 text-gray-400 hover:text-gray-200 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                ← Back to Games
+              </motion.button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedGame}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  {games.find(game => game.id === selectedGame)?.component}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          )}
+        </motion.div>
       </div>
+    </div>
   );
 };
 
