@@ -31,7 +31,7 @@ import { searchContent, SearchResult } from "@/services/search";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { getUserDetails } from "@/lib/user-details/action";
 import Image from "next/image";
-
+import LOGO from "../../public/image.png";
 // Definicja typów
 type NavLink = {
   name: string;
@@ -477,9 +477,8 @@ const FloatingNavbar: React.FC = () => {
             className="flex items-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1"
             aria-label="TaxMaster Dashboard"
           >
-            <motion.div className="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600">
-              <span className="font-bold text-xl text-white">D</span>
-            </motion.div>
+            <Image src={LOGO} alt="Opis obrazka" width={50} height={50} />
+
             <motion.span
               className="font-bold text-xl"
               initial={{ opacity: 0, x: -10 }}
@@ -776,7 +775,7 @@ const FloatingNavbar: React.FC = () => {
                 aria-haspopup="true"
                 aria-expanded={userDropdownOpen}
               >
-                <Image 
+                <Image
                   src={defaultUser.avatar}
                   alt={`${defaultUser.name}'s avatar`}
                   width={32}
