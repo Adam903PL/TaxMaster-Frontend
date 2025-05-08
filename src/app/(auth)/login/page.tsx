@@ -70,7 +70,7 @@ const DarkLoginForm = () => {
           setSubmitted(true);
           setTimeout(() => {
             router.push('/dashboard'); 
-          }, 2000);
+          }, 500);
         } else {
           setLoginError(true);
         }

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExchangeAlt, faSpinner, faCopy, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { faExchangeAlt, faSpinner, faCopy, faVolumeUp, faRedo } from '@fortawesome/free-solid-svg-icons';
 
 const TranslatorPage = () => {
     const [term, setTerm] = useState('');
@@ -11,7 +11,7 @@ const TranslatorPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!term.trim()) return;
 
@@ -19,13 +19,13 @@ const TranslatorPage = () => {
         setError('');
         
         try {
-            // TODO: Replace with actual API call
-            const response = await fetch('/api/translator', {
+            // API call to get the explanation
+            const response = await fetch('/api/ask-ai-quiz', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ term }),
+                body: JSON.stringify({ message: term }),
             });
 
             if (!response.ok) {
@@ -33,8 +33,8 @@ const TranslatorPage = () => {
             }
 
             const data = await response.json();
-            setExplanation(data.explanation);
-        } catch {
+            setExplanation(data.response);
+        } catch (error) {
             setError('Failed to get explanation. Please try again.');
             setExplanation('');
         } finally {
@@ -51,6 +51,12 @@ const TranslatorPage = () => {
         window.speechSynthesis.speak(utterance);
     };
 
+    const handleReset = () => {
+        setTerm('');
+        setExplanation('');
+        setError('');
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center p-2 sm:p-4">
             <motion.div
@@ -61,6 +67,7 @@ const TranslatorPage = () => {
             >
                 <div className="text-center mb-4">
                     <h1 className="text-2xl font-bold text-gray-100">Financial Term Translator</h1>
+                    <p className="text-gray-400 mt-1">Enter any financial term to get a simple explanation</p>
                 </div>
 
                 <motion.div
@@ -76,36 +83,50 @@ const TranslatorPage = () => {
                                 <textarea
                                     value={term}
                                     onChange={(e) => setTerm(e.target.value)}
-                                    placeholder="Enter a financial term..."
+                                    placeholder="Enter a financial term (e.g., VAT, Compound Interest, Stock Options)..."
                                     className="w-full h-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none"
                                 />
                                 <div className="flex justify-between items-center mt-2">
                                     <div className="text-xs text-gray-400">
                                         {term.length} characters
                                     </div>
-                                    <motion.button
-                                        type="submit"
-                                        disabled={isLoading || !term.trim()}
-                                        className={`px-4 py-2 rounded-lg text-gray-100 font-medium transition-all duration-200 ${
-                                            isLoading || !term.trim()
-                                                ? 'bg-gray-600 cursor-not-allowed'
-                                                : 'bg-indigo-600 hover:bg-indigo-700'
-                                        }`}
-                                        whileHover={!isLoading && term.trim() ? { scale: 1.02 } : {}}
-                                        whileTap={!isLoading && term.trim() ? { scale: 0.98 } : {}}
-                                    >
-                                        {isLoading ? (
-                                            <>
-                                                <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
-                                                Translating...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
-                                                Translate
-                                            </>
+                                    <div className="flex space-x-2">
+                                        {explanation && (
+                                            <motion.button
+                                                type="button"
+                                                onClick={handleReset}
+                                                className="px-4 py-2 rounded-lg text-gray-100 font-medium bg-gray-600 hover:bg-gray-700 transition-all duration-200"
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <FontAwesomeIcon icon={faRedo} className="mr-2" />
+                                                Reset
+                                            </motion.button>
                                         )}
-                                    </motion.button>
+                                        <motion.button
+                                            type="submit"
+                                            disabled={isLoading || !term.trim()}
+                                            className={`px-4 py-2 rounded-lg text-gray-100 font-medium transition-all duration-200 ${
+                                                isLoading || !term.trim()
+                                                    ? 'bg-gray-600 cursor-not-allowed'
+                                                    : 'bg-indigo-600 hover:bg-indigo-700'
+                                            }`}
+                                            whileHover={!isLoading && term.trim() ? { scale: 1.02 } : {}}
+                                            whileTap={!isLoading && term.trim() ? { scale: 0.98 } : {}}
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                                                    Translating...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FontAwesomeIcon icon={faExchangeAlt} className="mr-2" />
+                                                    Translate
+                                                </>
+                                            )}
+                                        </motion.button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -119,7 +140,7 @@ const TranslatorPage = () => {
                                     </div>
                                 ) : (
                                     <div className="h-full flex items-center justify-center text-gray-400">
-                                        Translation will appear here
+                                        Simplified explanation will appear here
                                     </div>
                                 )}
                             </div>
@@ -135,7 +156,7 @@ const TranslatorPage = () => {
                                     <button
                                         onClick={handleSpeak}
                                         className="p-2 text-gray-400 hover:text-gray-200 transition-colors"
-                                        title="Listen to pronunciation"
+                                        title="Listen to explanation"
                                     >
                                         <FontAwesomeIcon icon={faVolumeUp} />
                                     </button>

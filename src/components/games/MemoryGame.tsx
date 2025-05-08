@@ -14,7 +14,20 @@ const MorphingParticleSystem = ({ matchedPairs, totalPairs, gameComplete }) => {
   const wordRef = useRef(null);
 
   // Words that can be formed by particles
-  const possibleWords = ["TechniSchools", "CodeCamp"];
+  const possibleWords = ["CodeCamp"];
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   useEffect(() => {
     // Clean up existing renderer to prevent duplicates
@@ -256,8 +269,8 @@ const EnhancedMemoryGame = () => {
   const financialTerms = [
     { term: 'Compound Interest', definition: 'Interest earned on both the principal and accumulated interest' },
     { term: 'Dividend', definition: 'A portion of a company\'s profits paid to shareholders' },
-    { term: 'ROI', definition: 'Return on Investment - measure of profitability' },
-    { term: 'ETF', definition: 'Exchange Traded Fund - tracks an index or sector' },
+    // { term: 'ROI', definition: 'Return on Investment - measure of profitability' },
+    // { term: 'ETF', definition: 'Exchange Traded Fund - tracks an index or sector' },
     // { term: 'Bull Market', definition: 'Market trend characterized by rising prices' },
     // { term: 'Bear Market', definition: 'Market trend characterized by falling prices' },
     // { term: 'P/E Ratio', definition: 'Price-to-Earnings Ratio - company valuation metric' },
