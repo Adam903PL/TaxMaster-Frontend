@@ -29,6 +29,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-gray-900 text-gray-100 relative overflow-x-hidden">
         <ParallaxBackground />
         <InteractiveBackground/>
+
         <main className="flex-grow relative z-10">{children}</main>
       </body>
     </html>
