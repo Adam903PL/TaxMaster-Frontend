@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ParallaxBackground from "@/components/ParallaxBackground";
+import InteractiveBackground from "@/components/InteractiveBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-gray-900 text-gray-100 relative overflow-x-hidden">
         <ParallaxBackground />
+        <InteractiveBackground/>
         <main className="flex-grow relative z-10">{children}</main>
       </body>
     </html>
